@@ -46,22 +46,22 @@ static int read_file_io_uring(struct io_uring *ring, const char *file)
 			break;
 		}
 
-		do {
-			i = 0;
-			io_uring_for_each_cqe(ring, head, cqe) {
-				// size_t wr_ret;
-				//wr_ret =
-				write(1, buf, cqe->res);
-				// (void)wr_ret;
-				// printf("res = %d; u = %u\n", cqe->res,
-				// 	(unsigned)cqe->user_data);
-				i++;
-				if (cqe->res == 0)
-					goto out;
-			}
-			// printf("i = %u\n", i);
-			io_uring_cq_advance(ring, i);
-		} while (i);
+		i = 0;
+		io_uring_for_each_cqe(ring, head, cqe) {
+			// size_t wr_ret;
+			//wr_ret =
+			write(1, buf[i], cqe->res);
+			// (void)wr_ret;
+			// printf("res = %d; u = %u\n", cqe->res,
+			// 	(unsigned)cqe->user_data);
+			i++;
+			if (i == 10)
+				break;
+			if (cqe->res <= 0)
+				goto out;
+		}
+		// printf("i = %u\n", i);
+		io_uring_cq_advance(ring, i);
 	}
 
 out:
